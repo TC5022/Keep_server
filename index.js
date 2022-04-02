@@ -1,15 +1,21 @@
 import express from 'express';
+import bodyParser from "body-parser";
+import * as dotenv from "dotenv";
 import routes from './src/routes/index.js';
+import * as db from "./src/config/mongoose.js";
 
+dotenv.config();
 const app = express();
 const port = 8000;
 
+app.use(bodyParser.json({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', routes);
+db.init();
 
-app.listen(port, function(err){
-    if(err){
-        console.log(err);
-    }
-
-    console.log(`Server running on port: ${port}`);
+app.listen(port, function (err) {
+  if (err) {
+    console.log(err);
+  }
+  console.log(`Server running on port: ${port}`);
 });
