@@ -3,6 +3,6 @@ import { createNote } from "../controllers/note.js";
 
 const noteRouter = express.Router();
 
-router.post("/", createNote);
+noteRouter.post("/", createNote);
 
 export default noteRouter;

@@ -1,12 +1,12 @@
 import express from "express";
-import { home } from "../controllers/home.js";
+import { fetchNotes } from "../controllers/home.js";
 import user from "./user.js";
 import noteRouter from "./note.js";
 
 const router = express.Router();
 
-router.get("/", home);
-router.use("/user", user);
-router.use("/note", noteRouter);
+router.get("/v1", fetchNotes);
+router.use("/v1/user", user);
+router.use("/v1/note", noteRouter);
 
 export default router;

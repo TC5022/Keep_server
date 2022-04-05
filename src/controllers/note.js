@@ -1,5 +1,5 @@
-import Note from "../models/note";
-import User from "../models/user";
+import Note from "../models/note.js";
+import User from "../models/user.js";
 
 export const createNote = async (req, res) => {
     const {title, content, imageSrc, color, labels} = req.body;
