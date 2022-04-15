@@ -26,8 +26,6 @@ export const createNote = async (req, res) => {
 export const copyNote = async (req, res) => {
   const noteId = req.body.noteId;
   const userId = req.userId;
-  // console.log(noteId);
-  // console.log(req.body);
   try {
     let user = await User.findById(userId);
     let note = await Note.findById(noteId);
@@ -54,6 +52,22 @@ export const updateNote = async (req, res) => {
   };
 }
 
-export const deleteNote = async (req, res) => {
-  
+export const deleteNote = async (req, res) => { 
+  const noteId = req.body.noteId;
+  try {
+    let note = await Note.findById(noteId);
+    let userId = note.userId;
+
+    if(userId == req.userId){
+
+      note.remove();
+      await User.findByIdAndUpdate(userId, { $pull: { notes: noteId } });         
+      res.status(200).json({ message: "Note deleted", success: true });
+
+    }else {
+      res.status(401).json({message: "Unauthorised access"});
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 }
