@@ -30,22 +30,28 @@ export const copyNote = async (req, res) => {
     let user = await User.findById(userId);
     let note = await Note.findById(noteId);
     let newNote = note;
-    console.log(newNote);
     delete newNote._id;
+
     const finalNote = new Note(newNote);
-    console.log('final', finalNote);
     await finalNote.save();
+
     user.notes.splice(0, 0, newNote);
     user.save();
+
     res.status(200).json({ message: "Note copied", note: finalNote });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const updateNote = async (req, res) => {
+export const editNote = async (req, res) => {
+  const {noteId, title, content} = req.body
   try {
-    const note = await Note.findByIdAndUpdate(req.note._id, req.body);
+    const note = await Note.findByIdAndUpdate(
+      noteId,
+      { title: title, content: content },
+      { new: true }
+    );
     res.status(200).json({ message: "Note Updated successfully", note: note });
   } catch (error) {
     res.status(500).json(error);
