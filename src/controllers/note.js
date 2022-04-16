@@ -45,35 +45,50 @@ export const copyNote = async (req, res) => {
 };
 
 export const editNote = async (req, res) => {
-  const {noteId, title, content} = req.body
+  const { noteId } = req.body;
+  const query = req.params.query;
+
   try {
-    const note = await Note.findByIdAndUpdate(
-      noteId,
-      { title: title, content: content },
-      { new: true }
-    );
+    let note;
+    if (query == "edit") {
+      const { title, content } = req.body;
+      note = await Note.findByIdAndUpdate(
+        noteId,
+        { title: title, content: content },
+        { new: true }
+      );
+    } else if (query == "color") {
+      const { color } = req.body;
+      note = await Note.findByIdAndUpdate(
+        noteId,
+        { color: color },
+        { new: true }
+      );
+    } else if (query == "image") {
+      const { imageSrc } = req.body;
+      note = await Note.findByIdAndUpdate(noteId, { $push: {imageSrc: imageSrc}}, {new: true});
+    }
+
     res.status(200).json({ message: "Note Updated successfully", note: note });
   } catch (error) {
     res.status(500).json(error);
-  };
-}
+  }
+};
 
-export const deleteNote = async (req, res) => { 
+export const deleteNote = async (req, res) => {
   const noteId = req.body.noteId;
   try {
     let note = await Note.findById(noteId);
     let userId = note.userId;
 
-    if(userId == req.userId){
-
+    if (userId == req.userId) {
       note.remove();
-      await User.findByIdAndUpdate(userId, { $pull: { notes: noteId } });         
+      await User.findByIdAndUpdate(userId, { $pull: { notes: noteId } });
       res.status(200).json({ message: "Note deleted", success: true });
-
-    }else {
-      res.status(401).json({message: "Unauthorised access"});
+    } else {
+      res.status(401).json({ message: "Unauthorised access" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
