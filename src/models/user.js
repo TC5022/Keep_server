@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema(
     name: { type: String, required: true },
     notes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Note" }],
     archives: [{ type: mongoose.Schema.Types.ObjectId, ref: "Note" }],
-    labels: { type: Array, required: false },
+    labels: [{ type: mongoose.Schema.Types.ObjectId, ref: "Label" }],
   },
   { timestamps: true }
 );
