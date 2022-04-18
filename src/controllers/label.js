@@ -23,10 +23,18 @@ export const createLabel = async (req, res) => {
   try {
       const newLabel = new Label({name: labelName, notes: notes});
       await newLabel.save();
-      const note = await Note.findById(
-        noteId)
+
+      const note = await Note.findById(noteId)
       note.labels.push(newLabel);
       await note.save();
+      await note.populate({ path: "labels", select: ["_id", "name"] });
+
+      await newLabel.populate({
+         path: "notes",
+         populate: { path: "labels", select: ["_id", "name"] },
+       });
+
+
       const user = await User.findById(
         userId
       );
