@@ -48,6 +48,32 @@ export const createLabel = async (req, res) => {
   }
 };
 
+export const addLabelToNote = async (req, res) => {
+  const {noteId, labelId} = req.body;
+
+  try {
+    const note = await Note.findByIdAndUpdate(
+      noteId,
+      { $push: { labels: labelId } },
+      { new: true }
+    ).populate({ path: "labels", select: ["_id", "name"] });
+
+    const label = await Label.findByIdAndUpdate(
+      labelId,
+      { $push: { notes: noteId } },
+      { new: true }
+    ).populate({
+      path: "notes",
+      populate: { path: "labels", select: ["_id", "name"] },
+    });
+
+    res.status(200).json({message: 'Label added', label: label, note: note});
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export const removeLabelFromNote = async (req, res) => {
   const {noteId, labelId} = req.body;
 

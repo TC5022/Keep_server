@@ -1,3 +1,4 @@
+import Label from "../models/label.js";
 import Note from "../models/note.js";
 import User from "../models/user.js";
 
@@ -108,15 +109,17 @@ export const deleteNote = async (req, res) => {
   const noteId = req.body.noteId;
   try {
     let note = await Note.findById(noteId);
-    let userId = note.userId;
+    let userId = req.userId;
 
-    if (userId == req.userId) {
-      note.remove();
-      await User.findByIdAndUpdate(userId, { $pull: { notes: noteId } });
-      res.status(200).json({ message: "Note deleted", success: true });
-    } else {
-      res.status(401).json({ message: "Unauthorised access" });
+    for (let a = 0; a < note.labels.length; a++) {
+      await Label.findByIdAndUpdate(note.labels[a], {
+        $pull: { notes: noteId },
+      });
     }
+
+    note.remove();
+    await User.findByIdAndUpdate(userId, { $pull: { notes: noteId } });
+    res.status(200).json({ message: "Note deleted", success: true, labels: note.labels });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
