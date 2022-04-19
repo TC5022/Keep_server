@@ -40,6 +40,13 @@ export const copyNote = async (req, res) => {
       userId: userId,
     });
     await finalNote.save();
+    finalNote.populate({ path: "labels", select: ["_id", "name"] });
+    
+    for (let a = 0; a < finalNote.labels.length; a++) {
+      await Label.findByIdAndUpdate(note.labels[a], {
+        $push: { notes: finalNote._id },
+      });
+    }
 
     user.notes.splice(0, 0, finalNote);
     user.save();
