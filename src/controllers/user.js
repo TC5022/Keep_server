@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { TOKEN_SECRET } from "../config/config.js";
 
-export const generateToken = (userId, email) =>
-  jwt.sign({ userId, email }, TOKEN_SECRET, {
+export const generateToken = (userId, email, name) =>
+  jwt.sign({ userId, email, name }, TOKEN_SECRET, {
     algorithm: "HS512",
     expiresIn: "30d",
   });
@@ -29,7 +29,7 @@ export const Register = async (req, res) => {
         await newUser.save();
         res.status(201).json({
           user: newUser,
-          token: generateToken(newUser._id, newUser.email),
+          token: generateToken(newUser._id, newUser.email, newUser.name),
           message: "You have successfully registered.",
           success: true
         });
@@ -54,7 +54,7 @@ export const Login = async (req, res) => {
         res.status(200).json({
           message: "You have successfully logged in.",
           user: user,
-          token: generateToken(user._id, user.email),
+          token: generateToken(user._id, user.email, user.name),
           success: true
         });
       } else {
